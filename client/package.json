@@ -2,7 +2,7 @@
   "name": "entry-test-client",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "packageManager": "yarn@3.6.1",
   "devDependencies": {
     "@types/node": "^20.4.2",
