@@ -1,0 +1,29 @@
+@use "../styles.scss";
+
+body{
+  display: flex;
+}
+
+#root {
+  max-width: 500px;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+
+  & :first-child{
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+  
+  
+  & > div{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    column-gap: 5px;
+    margin-bottom: 5px;
+  }
+
+  #subject-list{
+    display: block;
+  }
+  
+}

@@ -2,7 +2,7 @@ import axios from "axios";
 import { SUBJECTS_API_URL } from "../constants/api";
 
 // Import styles
-import "../css/styles.css";
+import "../css/pages/subjects.scss";
 
 // TODO: Add a way to display a warning message if there are no subjects
 
