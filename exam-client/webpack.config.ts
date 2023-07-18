@@ -19,7 +19,7 @@ const config: webpack.Configuration = {
     mode: isProduction ? "production" : "development",
     entry: path.resolve(__dirname, "src/index.ts"),
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'build'),
         filename: '[name].[contenthash].js',
         clean: true,
     },

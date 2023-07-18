@@ -52,7 +52,7 @@ const config: webpack.Configuration = {
     mode: isProduction ? "production" : "development",
     entry: entryPoints,
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'build'),
         filename: '[name].[contenthash].js',
         clean: true,
     },
