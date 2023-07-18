@@ -23,7 +23,7 @@
   "scripts": {
     "build": "tsc --build && cp .env build/",
     "clean-build": "tsc --build --clean && yarn build",
-    "start": "cd build && node index.js", 
+    "start": "cd build && node index.js",
     "dev": "ts-node-dev ./src/index.ts"
   }
 }
