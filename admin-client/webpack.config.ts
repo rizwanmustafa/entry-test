@@ -4,21 +4,23 @@ import path from "path";
 import fs from "fs";
 import webpack from "webpack";
 import "webpack-dev-server";
-
-
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
-const isProduction = process.env.NODE_ENV == 'production';
+const isProduction = process.env.NODE_ENV == 'production' || process.argv[process.argv.indexOf('--mode') + 1] === 'production';
 
 
 const stylesHandler = MiniCssExtractPlugin.loader;
 
+// * Creating Plugins for all HTML files
 const htmlFolderPath = path.resolve(__dirname, "src/html/");
 const htmlFiles = fs.readdirSync(htmlFolderPath);
-
 const htmlWebpackPlugins = htmlFiles.map(htmlFile => {
-    const chunkName = path.parse(htmlFile).name;
+    const parsedFilePath = path.parse(htmlFile);
+    isProduction || console.debug("HTML File:", parsedFilePath.base);
+    // The javascript chunk to be attached that has the same name
+    const chunkName = parsedFilePath.name;
+
     return new HtmlWebpackPlugin({
         template: path.resolve(htmlFolderPath, htmlFile),
         minify: isProduction,
@@ -27,31 +29,28 @@ const htmlWebpackPlugins = htmlFiles.map(htmlFile => {
     })
 })
 
+// * Creating entrypoints for all page handler script files
 const pagesPath = path.resolve(__dirname, "src/pages/");
 const pagesScripts = fs.readdirSync(pagesPath);
-
-const getEntryPoints = (): webpack.EntryObject => {
+const entryPoints: webpack.EntryObject = ((): webpack.EntryObject => {
     const entryObject: webpack.EntryObject = {};
 
     pagesScripts.forEach(pageScript => {
         const scriptPath = path.resolve(pagesPath, pageScript);
         const nameWithoutExtension = path.parse(pageScript).name;
-        // TODO: Remove this later
-        console.log("Entry Point: ", path.parse(scriptPath).base)
         const scriptBaseName = path.parse(scriptPath).name; // script.ts -> script
         entryObject[nameWithoutExtension] = { filename: `${scriptBaseName}.bundle.[contenthash].js`, import: scriptPath }
     })
 
     return entryObject;
-}
-
-console.log(getEntryPoints())
+})();
+isProduction || console.debug("Entry Points:", entryPoints)
 
 
 
 const config: webpack.Configuration = {
     mode: isProduction ? "production" : "development",
-    entry: getEntryPoints(),
+    entry: entryPoints,
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].[contenthash].js',
@@ -60,6 +59,7 @@ const config: webpack.Configuration = {
     devServer: {
         open: true,
         host: 'localhost',
+        hot: true
     },
     plugins: [
         ...htmlWebpackPlugins,
