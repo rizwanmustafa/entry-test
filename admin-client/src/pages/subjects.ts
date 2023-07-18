@@ -4,24 +4,31 @@ import { SUBJECTS_API_URL } from "../constants/api";
 // Import styles
 import "../css/styles.css";
 
-const subjectListElement = document.getElementById("subject-list");
+// TODO: Add a way to display a warning message if there are no subjects
 
-const subjectRefreshElement = document.getElementById("subject-refresh-btn");
-subjectRefreshElement.addEventListener("click", async () => {
-  const subjects = await getSubjects();
-  updateSubjectsDom(subjects);
-});
+// HTML Elements and their events
+const subjectListDiv = document.getElementById("subject-list");
 
-const subjectSelectAllElement = document.getElementById("subject-select-all-btn");
-subjectSelectAllElement.addEventListener("click", () => alterAllSubjectSelectState(true));
+const subjectRefreshButton = document.getElementById("subject-refresh-btn");
+subjectRefreshButton.addEventListener("click", async () => updateSubjectsDom(await getSubjects()));
 
-const subjectSelectNoneElement = document.getElementById("subject-select-none-btn");
-subjectSelectNoneElement.addEventListener("click", () => alterAllSubjectSelectState(false));
+const subjectSelectAllButton = document.getElementById("subject-select-all-btn");
+subjectSelectAllButton.addEventListener("click", () => alterAllSubjectSelectState(true));
 
-const subjectDeleteElement = document.getElementById("subject-delete-btn");
-subjectDeleteElement.addEventListener("click", () => {
-  getSelectedSubjectIds();
-});
+const subjectSelectNoneButton = document.getElementById("subject-select-none-btn");
+subjectSelectNoneButton.addEventListener("click", () => alterAllSubjectSelectState(false));
+
+const subjectDeleteButton = document.getElementById("subject-delete-btn");
+subjectDeleteButton.addEventListener("click", async () => deleteSelectedSubjects());
+
+const subjectFilterButton = document.getElementById("subject-filter-btn");
+const subjectFilterTextbox = document.getElementById("subject-filter-textbox") as HTMLInputElement;
+subjectFilterButton.addEventListener("click", () => filterSubjects());
+
+const subjectFilterResetButton = document.getElementById("subject-reset-btn");
+subjectFilterResetButton.addEventListener("click", () => filterSubjects(""))
+
+/* -------- */
 
 const getSubjects = async (): Promise<Subject[] | null> => {
   try {
@@ -36,7 +43,7 @@ const getSubjects = async (): Promise<Subject[] | null> => {
 
 const updateSubjectsDom = (subjects: Subject[] | null) => {
   if (subjects === null) {
-    subjectListElement.innerHTML = "<p>No Subjects from API!</p>";
+    subjectListDiv.innerHTML = "<p>No Subjects from API!</p>";
     return;
   }
 
@@ -45,29 +52,68 @@ const updateSubjectsDom = (subjects: Subject[] | null) => {
 
   subjects.forEach(subject => {
     newHtml += `
-    <div>
+    <div subject-id='${subject.id}'>
       <input type="checkbox">
-      <span subject-id='${subject.id}'>${subject.name}</span>
+      <span>${subject.name}</span>
       </div>
     `
   })
-  subjectListElement.innerHTML = newHtml;
+  subjectListDiv.innerHTML = newHtml;
 }
 
 const getSelectedSubjectIds = (): Subject["id"][] => {
-  const selectedSubjects = subjectListElement.querySelectorAll("input[type='checkbox']:checked");
+  const selectedSubjects = subjectListDiv.querySelectorAll("input[type='checkbox']:checked");
+  const ids: string[] = [];
   selectedSubjects.forEach(i => {
-    console.log(i.nextElementSibling.getAttribute("subject-id"));
+    ids.push(i.parentElement.getAttribute("subject-id"));
   });
-  return ["0"];
+
+  return ids;
+}
+
+const deleteSelectedSubjects = () => {
+  const selectedSubjectIds = getSelectedSubjectIds();
+
+  selectedSubjectIds.forEach(subjectId => {
+    axios.delete(SUBJECTS_API_URL, { data: { id: subjectId } })
+      .then(() => {
+        const element = subjectListDiv.querySelector(`div[subject-id='${subjectId}']`);
+        element.remove();
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  })
 }
 
 const alterAllSubjectSelectState = (checked = false) => {
-  const checkboxElements = subjectListElement.querySelectorAll<HTMLInputElement>("input[type='checkbox']");
+  const checkboxElements = subjectListDiv.querySelectorAll<HTMLInputElement>("input[type='checkbox']");
 
   checkboxElements.forEach(checkboxElement => {
     checkboxElement.checked = checked;
   })
+}
+
+const filterSubjects = (filterKeyword: string = null) => {
+  filterKeyword = filterKeyword === null ? subjectFilterTextbox.value : filterKeyword;
+  console.log(filterKeyword);
+
+  const subjectElements = subjectListDiv.children;
+
+  for (let i = 0; i < subjectElements.length; i++) {
+    const subjectElement = subjectElements[i] as HTMLDivElement;
+    console.log(subjectElement);
+    const subjectName = subjectElement.querySelector("span").textContent;
+    const subjectCheckbox = subjectElement.querySelector<HTMLInputElement>("input");
+
+    if (subjectName.includes(filterKeyword)) {
+      subjectElement.style.display = "";
+    }
+    else {
+      subjectElement.style.display = "none";
+      subjectCheckbox.checked = false;
+    }
+  }
 }
 
 (async () => {
