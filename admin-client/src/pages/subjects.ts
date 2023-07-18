@@ -5,22 +5,23 @@ import { SUBJECTS_API_URL } from "../constants/api";
 import "../css/styles.css";
 
 const subjectListElement = document.getElementById("subject-list");
+
 const subjectRefreshElement = document.getElementById("subject-refresh-btn");
-const subjectSelectAllElement = document.getElementById("subject-select-all-btn");
-const subjectDeleteElement = document.getElementById("subject-delete-selected-btn");
-
-
-subjectDeleteElement.addEventListener("click", () => {
-  getSelectedSubjectIds();
-})
-
 subjectRefreshElement.addEventListener("click", async () => {
   const subjects = await getSubjects();
   updateSubjectsDom(subjects);
 });
 
-subjectSelectAllElement.addEventListener("click", () => selectAllSubjects);
+const subjectSelectAllElement = document.getElementById("subject-select-all-btn");
+subjectSelectAllElement.addEventListener("click", () => alterAllSubjectSelectState(true));
 
+const subjectSelectNoneElement = document.getElementById("subject-select-none-btn");
+subjectSelectNoneElement.addEventListener("click", () => alterAllSubjectSelectState(false));
+
+const subjectDeleteElement = document.getElementById("subject-delete-btn");
+subjectDeleteElement.addEventListener("click", () => {
+  getSelectedSubjectIds();
+});
 
 const getSubjects = async (): Promise<Subject[] | null> => {
   try {
@@ -32,7 +33,6 @@ const getSubjects = async (): Promise<Subject[] | null> => {
     return null;
   }
 }
-
 
 const updateSubjectsDom = (subjects: Subject[] | null) => {
   if (subjects === null) {
@@ -62,14 +62,12 @@ const getSelectedSubjectIds = (): Subject["id"][] => {
   return ["0"];
 }
 
-const selectAllSubjects = () => {
+const alterAllSubjectSelectState = (checked = false) => {
   const checkboxElements = subjectListElement.querySelectorAll<HTMLInputElement>("input[type='checkbox']");
 
   checkboxElements.forEach(checkboxElement => {
-    checkboxElement.checked = true;
+    checkboxElement.checked = checked;
   })
-  console.log(checkboxElements);
-
 }
 
 (async () => {

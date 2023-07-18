@@ -76,6 +76,7 @@ const loggerOptions: winston.LoggerOptions = {
 
 const logger = winston.createLogger(loggerOptions);
 
+// TODO: Add another log level called morgan and have a separate file for it
 class LoggerStream {
   write(text: string) {
     logger.info(text.replace(/\n$/, ''));
