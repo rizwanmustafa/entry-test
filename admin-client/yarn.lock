@@ -2432,9 +2432,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"entry-test-client@workspace:.":
+"entry-test-admin-client@workspace:.":
   version: 0.0.0-use.local
-  resolution: "entry-test-client@workspace:."
+  resolution: "entry-test-admin-client@workspace:."
   dependencies:
     "@types/node": ^20.4.2
     "@types/webpack": ^5.28.1
