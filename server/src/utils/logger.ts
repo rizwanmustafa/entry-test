@@ -76,6 +76,13 @@ const loggerOptions: winston.LoggerOptions = {
 
 const logger = winston.createLogger(loggerOptions);
 
+class LoggerStream {
+  write(text: string) {
+    logger.info(text.replace(/\n$/, ''));
+  }
+}
+export let loggerStream = new LoggerStream();
+
 const HelperLogger = {
   error: (message: string): winston.Logger => logger.error(message),
   warning: (message: string): winston.Logger => logger.warning(message),
