@@ -6,6 +6,7 @@
     "module": "es6",
     "target": "es5",
     "allowJs": false,
+    "moduleResolution": "Node"
   },
   "include": ["src"],
   "ts-node": {

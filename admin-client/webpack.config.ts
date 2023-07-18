@@ -59,11 +59,16 @@ const config: webpack.Configuration = {
     devServer: {
         open: true,
         host: 'localhost',
-        hot: true
+        hot: true,
+        port: 3000,
+        watchFiles: [path.resolve(__dirname, "src/**/*")]
     },
     plugins: [
         ...htmlWebpackPlugins,
         new MiniCssExtractPlugin(),
+        new webpack.DefinePlugin({
+            'process.env': JSON.stringify(process.env)
+        })
     ],
     module: {
         rules: [
