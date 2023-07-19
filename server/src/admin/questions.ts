@@ -11,17 +11,17 @@ const questionsRouter = Router();
 
 questionsRouter.get("/", async (req, res) => {
   if (req.body.id) {
-    const reqQuestion = await QuestionModel.findOne({ id: req.body.id });
+    const reqQuestion = await QuestionModel.findOne({ id: req.body.id }).exec();
 
     if (reqQuestion) {
-      return res.json({ ...reqQuestion, _id: undefined }) // TODO: Create a remove _id function
+      return res.json(reqQuestion);
     }
     else {
       return res.status(404);
     }
   }
 
-  return res.json(await QuestionModel.find());
+  return res.json(await QuestionModel.find().exec());
 })
 
 questionsRouter.post("/", async (req, res) => {
@@ -31,15 +31,15 @@ questionsRouter.post("/", async (req, res) => {
 
     const { statement, type, options, correctOption, subjectId, difficulty } = req.body;
 
-    if (await QuestionModel.findOne({ statement }))
+    if (await QuestionModel.findOne({ statement }).exec())
       return res.status(409).json({ message: "Another question with the same statement already exists!" })
 
-    if (!(await SubjectModel.findOne({ id: subjectId })))
+    if (!(await SubjectModel.findOne({ id: subjectId }).exec()))
       return res.status(400).json({ message: "No subject with the given id exists!" })
 
     // Generate a unique id
     let newId = uuid();
-    while (await QuestionModel.findOne({ id: newId }))
+    while (await QuestionModel.findOne({ id: newId }).exec())
       newId = uuid();
 
     const newQuestion = new QuestionModel({ id: newId, statement, type, options, correctOption, subjectId, difficulty });
@@ -60,7 +60,7 @@ questionsRouter.delete("/", async (req, res) => {
   const questionId = req.body.id;
 
   try {
-    await QuestionModel.deleteOne({ id: questionId });
+    await QuestionModel.deleteOne({ id: questionId }).exec();
 
     return res.sendStatus(200);
   }

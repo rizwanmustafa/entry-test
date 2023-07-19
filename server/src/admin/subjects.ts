@@ -10,7 +10,7 @@ const subjectsRouter = Router();
 
 subjectsRouter.get("/", async (req, res) => {
   if (req.body.id) {
-    const reqSubject = await SubjectModel.findOne({ id: req.body.id });
+    const reqSubject = await SubjectModel.findOne({ id: req.body.id }).exec();
 
     if (reqSubject) {
       return res.json(reqSubject)
@@ -20,7 +20,7 @@ subjectsRouter.get("/", async (req, res) => {
     }
   }
 
-  return res.json(await SubjectModel.find());
+  return res.json(await SubjectModel.find().exec());
 })
 
 subjectsRouter.post("/", async (req, res) => {
@@ -35,7 +35,7 @@ subjectsRouter.post("/", async (req, res) => {
 
     // Generate a unique id
     let newId = uuid();
-    while (await SubjectModel.findOne({ id: newId }))
+    while (await SubjectModel.findOne({ id: newId }).exec())
       newId = uuid();
 
     const newSubject = new SubjectModel({ name: subjectName, id: newId });
@@ -56,7 +56,7 @@ subjectsRouter.delete("/", async (req, res) => {
   const subjectId = req.body.id;
 
   try {
-    await SubjectModel.deleteOne({ id: subjectId });
+    await SubjectModel.deleteOne({ id: subjectId }).exec();
 
     return res.sendStatus(200);
   }
