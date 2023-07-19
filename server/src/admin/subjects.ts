@@ -13,7 +13,7 @@ subjectsRouter.get("/", async (req, res) => {
     const reqSubject = await SubjectModel.findOne({ id: req.body.id });
 
     if (reqSubject) {
-      return res.json({ ...reqSubject, _id: undefined }) // TODO: Create a remove _id function
+      return res.json(reqSubject)
     }
     else {
       return res.status(404);
