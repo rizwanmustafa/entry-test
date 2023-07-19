@@ -1,5 +1,6 @@
 import { Router } from "express";
 import logger from "../utils/logger";
+import { getMongoDb } from "../utils/db";
 
 const subjectsRouter = Router();
 
@@ -27,7 +28,26 @@ subjectsRouter.get("/", (req, res) => {
   res.json(demoSubjects);
 })
 
-subjectsRouter.post("/", (req, res) => { })
+subjectsRouter.post("/", async (req, res) => {
+  try {
+    console.log(req.body);
+    const subjectName = req.body.name;
+    console.log("Subject Name: ", subjectName);
+
+    const db = await getMongoDb();
+    console.log(db);
+    const subjectCollection = db.collection("subjects");
+
+    const result = await subjectCollection.insertOne({ name: subjectName });
+    res.json(result);
+  }
+  catch (error) {
+    logger.error("An error occurred while adding a new subject!");
+    logger.error((error as Error).message);
+    res.sendStatus(500);
+  }
+
+})
 
 subjectsRouter.delete("/", (req, res) => {
   console.log(req.body);

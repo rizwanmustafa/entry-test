@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 
+import { establishConnection } from "./utils/db";
+
 dotenv.config();
 const PORT = process.env.PORT || 5000;
 const MODE = process.env.MODE === "production" ? "production" : "development";
@@ -23,5 +25,7 @@ app.use("/admin/", adminRouter);
 
 app.listen(PORT, () => {
   logger.success(`The server has started running at port ${PORT}!`);
-  logger.success(`The server URL is: http://localhost:${PORT}`)
+  logger.success(`The server URL is: http://localhost:${PORT}`);
+  
+  establishConnection();
 })
