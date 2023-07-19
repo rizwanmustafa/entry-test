@@ -13,7 +13,7 @@ const MODE = process.env.MODE === "production" ? "production" : "development";
 import logger, { loggerStream } from "./utils/logger";
 
 // * Importing routers
-import adminRouter from "./admin";
+import adminRouter  from "./admin";
 
 const app = express();
 
@@ -22,10 +22,11 @@ app.use(morgan(MODE === 'production' ? 'combined' : 'dev', { stream: loggerStrea
 app.use(express.json());
 app.use("/admin/", adminRouter);
 
+(async () => {
+  await establishConnection();
+  app.listen(PORT, () => {
+    logger.success(`The server has started running at port ${PORT}!`);
+    logger.success(`The server URL is: http://localhost:${PORT}`);
+  })
 
-app.listen(PORT, () => {
-  logger.success(`The server has started running at port ${PORT}!`);
-  logger.success(`The server URL is: http://localhost:${PORT}`);
-  
-  establishConnection();
-})
+})()
