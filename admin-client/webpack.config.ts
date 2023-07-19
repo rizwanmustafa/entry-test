@@ -6,6 +6,7 @@ import webpack from "webpack";
 import "webpack-dev-server";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import { ProxyConfigMap } from "webpack-dev-server";
 
 const isProduction = process.env.NODE_ENV == 'production' || process.argv[process.argv.indexOf('--mode') + 1] === 'production';
 
@@ -28,6 +29,23 @@ const htmlWebpackPlugins = htmlFiles.map(htmlFile => {
         chunks: [chunkName]
     })
 })
+
+// * Creating proxies for all html pages
+const htmlPageProxies: ProxyConfigMap = ((): ProxyConfigMap => {
+    const proxies: ProxyConfigMap = {};
+
+    htmlFiles.forEach(htmlFile => {
+        
+        const fileName = path.parse(htmlFile).name;
+        if (fileName=== "index") return;
+        proxies["/" + fileName] = {
+            target: `http://localhost:3000/${fileName}.html`,
+            pathRewrite: { [`^/${fileName}`]: '' }
+        }
+    })
+    return proxies;
+})()
+isProduction || console.debug("HTML Page Proxies:", htmlPageProxies)
 
 // * Creating entrypoints for all page handler script files
 const pagesPath = path.resolve(__dirname, "src/pages/");
@@ -61,7 +79,9 @@ const config: webpack.Configuration = {
         host: 'localhost',
         hot: true,
         port: 3000,
-        watchFiles: [path.resolve(__dirname, "src/**/*")]
+        watchFiles: [path.resolve(__dirname, "src/**/*")],
+
+        proxy: { ...htmlPageProxies }
     },
     plugins: [
         ...htmlWebpackPlugins,
