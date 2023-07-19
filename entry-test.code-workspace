@@ -1,0 +1,28 @@
+{
+	"folders": [
+		{
+			"path": ".",
+			"name": "Root"
+		},
+		{
+			"path": "admin-client",
+      "name": "Admin Client"
+		},
+		{
+			"path": "server",
+      "name": "Server"
+		},
+		{
+			"path": "exam-client",
+      "name": "Exam Client"
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/build/**/*": true,
+			"admin-client": true,
+			"exam-client": true,
+			"server": true
+		}
+	}
+}
